@@ -69,11 +69,17 @@ polydiv p1 p2 = pdiv p1 [] where
 flush :: IO ()
 flush = hFlush stdout
 
+assert :: Bool -> String -> IO ()
+assert True _ = return ()
+assert False msg = error msg
+
 main :: IO Int
 main = do
   putStr "Choose operation [+-*/%]: "
   flush
   c <- getLine
+  assert (length c == 1) "Invalid operation"
+  assert (elem (head c) "+-*/%") "Invalid operation"
   putStr "Chosen operation: A "
   putStr c
   putStrLn " B"
