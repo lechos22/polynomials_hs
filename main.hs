@@ -66,11 +66,15 @@ polydiv p1 p2 = pdiv p1 [] where
       then (acc, p1trim)
       else pdiv after_subtract new_acc
 
+flush :: IO ()
+flush = hFlush stdout
+
 main :: IO Int
 main = do
   putStr "Choose operation [+-*/]: "
-  hFlush stdout
+  flush
   c <- getChar
-  putChar '\n'
+  putStr "Input polynomial n"
+  flush
   print $ polydiv [6,13,1,-2] [1,2.5,1]
   return 0
