@@ -38,7 +38,7 @@ polymuln (x:xs) y = (x*y: polymuln xs y)
 
 polymulp :: EqNum a => [a] -> [a] -> [a]
 polymulp p1 p2 = result where
-  pmul [] _ _ acc = acc
+  pmul [] _ acc = acc
   pmul (x:xs) padding acc =
     let
       to_add = polymuln p2 x ++ padding
