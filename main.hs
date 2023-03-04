@@ -45,12 +45,12 @@ polymuln (x:xs) y = (x*y: polymuln xs y)
 polymulp :: EqNum a => [a] -> [a] -> [a]
 polymulp p1 p2 = let
   pmul [] _ _ acc = acc
-  pmul (x:xs) p padding acc = let
-    to_add = polymuln p x ++ padding
+  pmul (x:xs) padding acc = let
+    to_add = polymuln p2 x ++ padding
     new_acc = polyadd acc to_add
-    in pmul xs p (0:padding) new_acc
+    in pmul xs (0:padding) new_acc
   in
-    pmul (reverse p1) p2 [] []
+    pmul (reverse p1) [] []
 
 polydiv :: EqNum a => Fractional a => [a] -> [a] -> ([a], [a])
 polydiv _ [] = ([1/0], [])
