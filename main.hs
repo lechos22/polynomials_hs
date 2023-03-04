@@ -99,6 +99,6 @@ main = do
         "*" -> polymulp a' b'
         "/" -> fst $ polydiv a' b'
         "%" -> snd $ polydiv a' b'
-        _ -> []
+        _ -> error "Unreachable"
   putStrLn $ "Result: " ++ (unwords $ map show result)
   return 0
