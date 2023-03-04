@@ -2,7 +2,7 @@ import Data.List (transpose)
 
 type EqNum a = (Num a, Eq a)
 
-pad :: EqNum a => a -> Int -> [a]
+pad :: a -> Int -> [a]
 pad _ 0 = []
 pad x n = (x: pad x (n-1))
 
