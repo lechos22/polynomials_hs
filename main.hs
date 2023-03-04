@@ -12,30 +12,29 @@ polyzip a1 a2 = zipped where
   sizedif = length a1 - length a2
   pad_a1 =
     if sizedif < 0
-    then (replicate (-sizedif) 0) ++ a1
+    then replicate (-sizedif) 0 ++ a1
     else a1
   pad_a2 =
     if sizedif > 0
-    then (replicate sizedif 0) ++ a2
+    then replicate sizedif 0 ++ a2
     else a2
   zipped = transpose [pad_a1, pad_a2]
 
 polyadd :: EqNum a => [a] -> [a] -> [a]
 polyadd p1 p2 = result where
-  sums (x:xs) = (sum x: sums xs)
+  sums (x:xs) = sum x: sums xs
   sums [] = []
   result = sums $ polyzip p1 p2
 
 polyopp :: EqNum a => [a] -> [a]
-polyopp [] = []
-polyopp (x:xs) = (-x: polyopp xs)
+polyopp = map negate
 
 polysub :: EqNum a => [a] -> [a] -> [a]
 polysub p1 p2 = polyadd p1 $ polyopp p2
 
 polymuln :: EqNum a => [a] -> a -> [a]
 polymuln [] _ = []
-polymuln (x:xs) y = (x*y: polymuln xs y)
+polymuln (x:xs) y = x*y: polymuln xs y
 
 polymulp :: EqNum a => [a] -> [a] -> [a]
 polymulp p1 p2 = result where
@@ -56,7 +55,7 @@ polydiv p1 p2 = pdiv p1 [] where
   pdiv pol acc = result where
     p1trim = polytrim pol
     (x:_) = p1trim
-    len_dif = (length p1trim) - (length p2trim)
+    len_dif = length p1trim - length p2trim
     to_acc = x / y
     new_acc = polyadd acc (to_acc: replicate len_dif 0)
     to_subtract = polymuln p2trim to_acc ++ replicate len_dif 0
@@ -79,7 +78,7 @@ main = do
   flush
   c <- getLine
   assert (length c == 1) "Invalid operation"
-  assert (elem (head c) "+-*/%") "Invalid operation"
+  assert (head c `elem` "+-*/%") "Invalid operation"
   putStr "Chosen operation: A "
   putStr c
   putStrLn " B"
@@ -100,5 +99,5 @@ main = do
         "/" -> fst $ polydiv a' b'
         "%" -> snd $ polydiv a' b'
         _ -> error "Unreachable"
-  putStrLn $ "Result: " ++ (unwords $ map show result)
+  putStrLn $ "Result: " ++ unwords (map show result)
   return 0
