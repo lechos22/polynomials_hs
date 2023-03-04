@@ -9,10 +9,10 @@ polytrim arr = arr
 
 polyzip :: EqNum a => [a] -> [a] -> [[a]]
 polyzip a1 a2 = zipped where
-  sizedif = length a1 - length a2
+  size_dif = length a1 - length a2
   zipped = transpose
-    [ replicate (max 0 (-sizedif)) 0 ++ a1
-    , replicate (max 0 sizedif) 0 ++ a2
+    [ replicate (max 0 (-size_dif)) 0 ++ a1
+    , replicate (max 0 size_dif) 0 ++ a2
     ]
 
 polyadd :: EqNum a => [a] -> [a] -> [a]
