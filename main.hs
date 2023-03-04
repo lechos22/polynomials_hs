@@ -1,4 +1,5 @@
 import Data.List (transpose)
+import System.IO
 
 type EqNum a = (Num a, Eq a)
 
@@ -68,6 +69,7 @@ polydiv p1 p2 = pdiv p1 [] where
 main :: IO Int
 main = do
   putStr "Choose operation [+-*/]: "
+  hFlush stdout
   c <- getChar
   putChar '\n'
   print $ polydiv [6,13,1,-2] [1,2.5,1]
