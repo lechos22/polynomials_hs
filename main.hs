@@ -71,10 +71,28 @@ flush = hFlush stdout
 
 main :: IO Int
 main = do
-  putStr "Choose operation [+-*/]: "
+  putStr "Choose operation [+-*/%]: "
   flush
-  c <- getChar
-  putStr "Input polynomial n"
+  c <- getLine
+  putStr "Chosen operation: A "
+  putStr c
+  putStrLn " B"
+  putStr "Input coeffictients of polynomial A: "
   flush
-  print $ polydiv [6,13,1,-2] [1,2.5,1]
+  a <- getLine
+  putStr "Input coeffictients of polynomial B: "
+  flush
+  b <- getLine
+  let
+    a' = map read $ words a
+    b' = map read $ words b
+    result =
+      case c of
+        "+" -> polyadd a' b'
+        "-" -> polysub a' b'
+        "*" -> polymulp a' b'
+        "/" -> fst $ polydiv a' b'
+        "%" -> snd $ polydiv a' b'
+        _ -> []
+  putStrLn $ "Result: " ++ (unwords $ map show result)
   return 0
