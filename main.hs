@@ -68,11 +68,10 @@ main = do
   c <- getLine
   assert (length c == 1) "Invalid operation"
   assert (head c `elem` "+-*/") "Invalid operation"
-  putStr "Chosen operation: A(x) "
   putStrLn $
     if c == "/"
-    then "= B(x) * Q(x) + R(x)"
-    else c ++ " B(x) = Q(x)"
+    then "A(x) = B(x) * Q(x) + R(x)"
+    else "Q(x) = A(x) " ++ c ++ " B(x)"
   putStr "A(x): "
   flush
   a <- getLine
