@@ -63,18 +63,20 @@ assert False msg = error msg
 
 main :: IO Int
 main = do
-  putStr "Choose operation [+-*/%]: "
+  putStr "Choose operation [+-*/]: "
   flush
   c <- getLine
   assert (length c == 1) "Invalid operation"
-  assert (head c `elem` "+-*/%") "Invalid operation"
-  putStr "Chosen operation: A "
-  putStr c
-  putStrLn " B"
-  putStr "Input coeffictients of polynomial A: "
+  assert (head c `elem` "+-*/") "Invalid operation"
+  putStr "Chosen operation: A(x) "
+  putStrLn $
+    if c == "/"
+    then "= B(x) * Q(x) + R(x)"
+    else c ++ " B(x) = Q(x)"
+  putStr "Coeffitients of polynomial A(x): "
   flush
   a <- getLine
-  putStr "Input coeffictients of polynomial B: "
+  putStr "Coeffitients of polynomial B(x): "
   flush
   b <- getLine
   let
@@ -82,11 +84,13 @@ main = do
     b' = map read $ words b
     result =
       case c of
-        "+" -> polyadd a' b'
-        "-" -> polysub a' b'
-        "*" -> polymulp a' b'
-        "/" -> fst $ polydiv a' b'
-        "%" -> snd $ polydiv a' b'
+        "+" -> "Coeffitients of Q(x): " ++ unwords (map show $ polyadd a' b')
+        "-" -> "Coeffitients of Q(x): " ++ unwords (map show $ polysub a' b')
+        "*" -> "Coeffitients of Q(x): " ++ unwords (map show $ polymulp a' b')
+        "/" -> text where
+          (q, r) = polydiv a' b'
+          text = "Coeffitients of Q(x): " ++ unwords (map show q)
+            ++ "\nCoeffictints of R(x): " ++ unwords (map show r)
         _ -> error "Unreachable"
-  putStrLn $ "Result: " ++ unwords (map show result)
+  putStrLn result
   return 0
