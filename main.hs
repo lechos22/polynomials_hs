@@ -67,6 +67,8 @@ polydiv p1 p2 = pdiv p1 [] where
 
 main :: IO Int
 main = do
+  putStr "Choose operation [+-*/]: "
+  c <- getChar
+  putChar '\n'
   print $ polydiv [6,13,1,-2] [1,2.5,1]
   return 0
-
