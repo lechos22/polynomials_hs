@@ -24,11 +24,10 @@ polyzip a1 a2 = zipped where
   zipped = transpose [pad_a1, pad_a2]
 
 polyadd :: EqNum a => [a] -> [a] -> [a]
-polyadd p1 p2 = let
+polyadd p1 p2 = result where
   sums (x:xs) = (sum x: sums xs)
   sums [] = []
-  in
-    sums $ polyzip p1 p2
+  result = sums $ polyzip p1 p2
 
 polyopp :: EqNum a => [a] -> [a]
 polyopp [] = []
