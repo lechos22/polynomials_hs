@@ -11,4 +11,3 @@ clean(%):
 ./target/%: %.hs
 	mkdir -p target
 	ghc $^ -o $@
-
