@@ -54,7 +54,7 @@ polymulp p1 p2 = let
 
 polydiv :: EqNum a => Fractional a => [a] -> [a] -> ([a], [a])
 polydiv _ [] = ([1/0], [])
-polydiv p1 p2 = let
+polydiv p1 p2 = pdiv p1 [] where
   p2trim = polytrim p2
   (y:_) = p2trim
   pdiv pol acc = result where
@@ -69,8 +69,6 @@ polydiv p1 p2 = let
       if len_dif < 0
       then (acc, p1trim)
       else pdiv after_subtract new_acc
-  in
-    pdiv p1 []
 
 main :: IO Int
 main = do
