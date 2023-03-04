@@ -11,7 +11,7 @@ polytrim (0:xs) = polytrim xs
 polytrim arr = arr
 
 polyzip :: EqNum a => [a] -> [a] -> [[a]]
-polyzip a1 a2 = let
+polyzip a1 a2 = zipped where
   sizedif = length a1 - length a2
   pad_a1 =
     if sizedif > 0
@@ -21,8 +21,7 @@ polyzip a1 a2 = let
     if sizedif < 0
     then a2
     else (pad 0 (sizedif)) ++ a2
-  in
-    transpose [pad_a1, pad_a2]
+  zipped = transpose [pad_a1, pad_a2]
 
 polyadd :: EqNum a => [a] -> [a] -> [a]
 polyadd p1 p2 = let
