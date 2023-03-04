@@ -2,10 +2,6 @@ import Data.List (transpose)
 
 type EqNum a = (Num a, Eq a)
 
-pad :: a -> Int -> [a]
-pad _ 0 = []
-pad x n = (x: pad x (n-1))
-
 polytrim :: EqNum a => [a] -> [a]
 polytrim (0:xs) = polytrim xs
 polytrim arr = arr
@@ -16,11 +12,11 @@ polyzip a1 a2 = zipped where
   pad_a1 =
     if sizedif > 0
     then a1
-    else (pad 0 (-sizedif)) ++ a1
+    else (replicate (-sizedif) 0) ++ a1
   pad_a2 =
     if sizedif < 0
     then a2
-    else (pad 0 (sizedif)) ++ a2
+    else (replicate sizedif 0) ++ a2
   zipped = transpose [pad_a1, pad_a2]
 
 polyadd :: EqNum a => [a] -> [a] -> [a]
@@ -61,8 +57,8 @@ polydiv p1 p2 = pdiv p1 [] where
     (x:_) = p1trim
     len_dif = (length p1trim) - (length p2trim)
     to_acc = x / y
-    new_acc = polyadd acc (to_acc: pad 0 len_dif)
-    to_subtract = polymuln p2trim to_acc ++ pad 0 len_dif
+    new_acc = polyadd acc (to_acc: replicate len_dif 0)
+    to_subtract = polymuln p2trim to_acc ++ replicate len_dif 0
     after_subtract = polysub p1trim to_subtract
     result =
       if len_dif < 0
