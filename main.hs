@@ -1,13 +1,11 @@
 import Data.List (transpose)
 import System.IO
 
-type EqNum a = (Num a, Eq a)
-
-polytrim :: EqNum a => [a] -> [a]
+polytrim :: Eq a => Num a => [a] -> [a]
 polytrim (0:xs) = polytrim xs
 polytrim arr = arr
 
-polyzip :: EqNum a => [a] -> [a] -> [[a]]
+polyzip :: Num a => [a] -> [a] -> [[a]]
 polyzip a1 a2 = zipped where
   size_dif = length a1 - length a2
   zipped = transpose
@@ -15,19 +13,19 @@ polyzip a1 a2 = zipped where
     , replicate (max 0 size_dif) 0 ++ a2
     ]
 
-polyadd :: EqNum a => [a] -> [a] -> [a]
+polyadd :: Num a => [a] -> [a] -> [a]
 polyadd p1 p2 = map sum $ polyzip p1 p2
 
-polyopp :: EqNum a => [a] -> [a]
+polyopp :: Num a => [a] -> [a]
 polyopp = map negate
 
-polysub :: EqNum a => [a] -> [a] -> [a]
+polysub :: Num a => [a] -> [a] -> [a]
 polysub p1 p2 = polyadd p1 $ polyopp p2
 
-polymuln :: EqNum a => [a] -> a -> [a]
+polymuln :: Num a => [a] -> a -> [a]
 polymuln p n = map (*n) p
 
-polymulp :: EqNum a => [a] -> [a] -> [a]
+polymulp :: Num a => [a] -> [a] -> [a]
 polymulp p1 p2 = result where
   pmul [] _ acc = acc
   pmul (x:xs) padding acc =
@@ -38,7 +36,7 @@ polymulp p1 p2 = result where
       pmul xs (0:padding) new_acc
   result = pmul (reverse p1) [] []
 
-polydiv :: EqNum a => Fractional a => [a] -> [a] -> ([a], [a])
+polydiv :: Eq a => Num a => Fractional a => [a] -> [a] -> ([a], [a])
 polydiv _ [] = ([1/0], [])
 polydiv p1 p2 = pdiv p1 [] where
   p2trim = polytrim p2
