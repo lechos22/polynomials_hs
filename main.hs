@@ -57,7 +57,7 @@ polydiv _ [] = ([1/0], [])
 polydiv p1 p2 = let
   p2trim = polytrim p2
   (y:_) = p2trim
-  div pol acc = result where
+  pdiv pol acc = result where
     p1trim = polytrim pol
     (x:_) = p1trim
     len_dif = (length p1trim) - (length p2trim)
@@ -68,9 +68,9 @@ polydiv p1 p2 = let
     result =
       if len_dif < 0
       then (acc, p1trim)
-      else div after_subtract new_acc
+      else pdiv after_subtract new_acc
   in
-    div p1 []
+    pdiv p1 []
 
 main :: IO Int
 main = do
