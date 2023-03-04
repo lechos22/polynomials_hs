@@ -57,7 +57,7 @@ polydiv _ [] = ([1/0], [])
 polydiv p1 p2 = let
   p2trim = polytrim p2
   (y:_) = p2trim
-  div pol acc = let
+  div pol acc = result where
     p1trim = polytrim pol
     (x:_) = p1trim
     len_dif = (length p1trim) - (length p2trim)
@@ -65,7 +65,7 @@ polydiv p1 p2 = let
     new_acc = polyadd acc (to_acc: pad 0 len_dif)
     to_subtract = polymuln p2trim to_acc ++ pad 0 len_dif
     after_subtract = polysub p1trim to_subtract
-    in
+    result =
       if len_dif < 0
       then (acc, p1trim)
       else div after_subtract new_acc
