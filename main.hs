@@ -73,10 +73,10 @@ main = do
     if c == "/"
     then "= B(x) * Q(x) + R(x)"
     else c ++ " B(x) = Q(x)"
-  putStr "Coeffitients of polynomial A(x): "
+  putStr "A(x): "
   flush
   a <- getLine
-  putStr "Coeffitients of polynomial B(x): "
+  putStr "B(x): "
   flush
   b <- getLine
   let
@@ -84,13 +84,13 @@ main = do
     b' = map read $ words b
     result =
       case c of
-        "+" -> "Coeffitients of Q(x): " ++ unwords (map show $ polyadd a' b')
-        "-" -> "Coeffitients of Q(x): " ++ unwords (map show $ polysub a' b')
-        "*" -> "Coeffitients of Q(x): " ++ unwords (map show $ polymulp a' b')
+        "+" -> "Q(x): " ++ unwords (map show $ polyadd a' b')
+        "-" -> "Q(x): " ++ unwords (map show $ polysub a' b')
+        "*" -> "Q(x): " ++ unwords (map show $ polymulp a' b')
         "/" -> text where
           (q, r) = polydiv a' b'
-          text = "Coeffitients of Q(x): " ++ unwords (map show q)
-            ++ "\nCoeffictints of R(x): " ++ unwords (map show r)
+          text = "Q(x): " ++ unwords (map show q)
+            ++ "\nR(x): " ++ unwords (map show r)
         _ -> error "Unreachable"
   putStrLn result
   return 0
