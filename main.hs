@@ -10,9 +10,10 @@ polytrim arr = arr
 polyzip :: EqNum a => [a] -> [a] -> [[a]]
 polyzip a1 a2 = zipped where
   sizedif = length a1 - length a2
-  pad_a1 = replicate (max 0 (-sizedif)) 0 ++ a1
-  pad_a2 = replicate (max 0 sizedif) 0 ++ a2
-  zipped = transpose [pad_a1, pad_a2]
+  zipped = transpose
+    [ replicate (max 0 (-sizedif)) 0 ++ a1
+    , replicate (max 0 sizedif) 0 ++ a2
+    ]
 
 polyadd :: EqNum a => [a] -> [a] -> [a]
 polyadd p1 p2 = map sum $ polyzip p1 p2
