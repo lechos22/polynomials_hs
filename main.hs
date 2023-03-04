@@ -10,13 +10,13 @@ polyzip :: EqNum a => [a] -> [a] -> [[a]]
 polyzip a1 a2 = zipped where
   sizedif = length a1 - length a2
   pad_a1 =
-    if sizedif > 0
-    then a1
-    else (replicate (-sizedif) 0) ++ a1
-  pad_a2 =
     if sizedif < 0
-    then a2
-    else (replicate sizedif 0) ++ a2
+    then (replicate (-sizedif) 0) ++ a1
+    else a1
+  pad_a2 =
+    if sizedif > 0
+    then (replicate sizedif 0) ++ a2
+    else a2
   zipped = transpose [pad_a1, pad_a2]
 
 polyadd :: EqNum a => [a] -> [a] -> [a]
