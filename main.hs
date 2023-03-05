@@ -70,10 +70,9 @@ polysolve [a, b, c] = result where
 polysolve _ = error "Polynomial degree is strictly greater than 2, I can't solve."
 
 solutionsToString :: Show a => Solutions a -> String
+solutionsToString (SolutionList []) = "∅"
 solutionsToString (SolutionList solutions) =
-  case solutions of
-    [] -> "∅"
-    _ -> "{" ++ intercalate ", " (map show solutions) ++ "}"
+  "{" ++ intercalate ", " (map show solutions) ++ "}"
 solutionsToString InfiniteSolutions = "R"
 
 flush :: IO ()
