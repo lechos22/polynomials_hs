@@ -83,7 +83,7 @@ assert :: Bool -> String -> IO ()
 assert True _ = return ()
 assert False msg = error msg
 
-main :: IO Int
+main :: IO ()
 main = do
   putStr "Choose operation [+-*/0]: "
   flush
@@ -119,4 +119,3 @@ main = do
         "0" -> "A = " ++ solutionsToString (polysolve w')
         _ -> error "Unreachable"
   putStrLn result
-  return 0
