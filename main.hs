@@ -1,5 +1,5 @@
 import Data.List (transpose)
-import System.IO
+import System.IO (hFlush, stdout)
 
 polytrim :: Eq a => Num a => [a] -> [a]
 polytrim (0:xs) = polytrim xs
