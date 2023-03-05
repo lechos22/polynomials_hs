@@ -152,10 +152,11 @@ main = do
       "-" -> "Q(x): " ++ unwords (map show $ polysub w p)
       "*" -> "Q(x): " ++ unwords (map show $ polymulp w p)
       "/" -> text
-        where (q, r) = polydiv w p
-              text =
-                "Q(x): " ++
-                unwords (map show q) ++ "\nR(x): " ++ unwords (map show r)
+        where
+          (q, r) = polydiv w p
+          text =
+            "Q(x): " ++ unwords (map show q) ++
+            "\nR(x): " ++ unwords (map show r)
       "y" -> "y = " ++ show (polyapply w x)
       "0" -> "A = " ++ solutionsToString (polysolve w)
       _ -> error "Unreachable"
