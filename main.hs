@@ -56,7 +56,7 @@ polydiv p1 p2 = pdiv p1 [] where
 
 data Solutions a = SolutionList [a] | InfiniteSolutions
 
-polyapply :: Num a => Floating a => Ord a => [a] -> a -> a
+polyapply :: Num a => Floating a => [a] -> a -> a
 polyapply [] _ = 0
 polyapply a x = papply a 0 where
   papply [] acc = acc
@@ -90,7 +90,7 @@ assert :: Bool -> String -> IO ()
 assert True _ = return ()
 assert False msg = error msg
 
-readPoly :: String -> IO [Double]
+readPoly :: Read a => Eq a => Num a => String -> IO [a]
 readPoly name = do
   putStr $ name ++ "(x): "
   flush
@@ -100,7 +100,7 @@ readPoly name = do
     poly' = polytrim poly
   return poly'
 
-readNumber :: String -> IO Double
+readNumber :: Read a => String -> IO a
 readNumber name = do
   putStr $ name ++ " = "
   flush
