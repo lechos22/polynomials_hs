@@ -75,7 +75,18 @@ polysolve [a, b, c] = result where
    | d < 0  = SolutionList []
    | d == 0 = SolutionList [(-b) / (2 * a)]
    | d > 0  = SolutionList [(-b + sqrt d) / (2 * a), (-b - sqrt d) / (2 * a)]
-polysolve _ = error "Polynomial degree is too high"
+polysolve w = find 0 where
+  find x = do
+    let
+      eps = 1e-6
+      y = polyapply w x
+      deriv = polyapply w (x+eps) - y
+      otherSolutions = polysolve (fst $ polydiv w [1, -x])
+      solutions InfiniteSolutions = InfiniteSolutions
+      solutions (SolutionList list) = SolutionList $ x : list
+    if abs y < eps then
+      solutions otherSolutions
+    else error "Unable to solve polynomial"
 
 solutionsToString :: Show a => Solutions a -> String
 solutionsToString (SolutionList []) = "∅"
