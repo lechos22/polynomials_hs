@@ -60,7 +60,6 @@ polysolve :: Eq a => Num a => Fractional a => Floating a => Ord a => [a] -> Solu
 polysolve [] = InfiniteSolutions
 polysolve (0: xs) = polysolve xs
 polysolve [_] = SolutionList []
-polysolve [_, 0] = SolutionList [0]
 polysolve [a, b] = SolutionList [-b/a]
 polysolve [a, b, c] = result where
   d = b^2 - 4 * a * c
