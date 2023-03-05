@@ -56,6 +56,14 @@ polydiv p1 p2 = pdiv p1 [] where
 
 data Solutions a = SolutionList [a] | InfiniteSolutions
 
+polyapply :: Num a => Floating a => Ord a => [a] -> a -> a
+polyapply [] _ = 0
+polyapply a x = papply a 0 where
+  papply [] acc = acc
+  papply (a:as) acc = papply as new_acc where
+    deg = length as
+    new_acc = acc + a * x^deg
+
 polysolve :: Eq a => Num a => Fractional a => Floating a => Ord a => [a] -> Solutions a
 polysolve [] = InfiniteSolutions
 polysolve (0: xs) = polysolve xs
@@ -67,7 +75,7 @@ polysolve [a, b, c] = result where
    | d < 0  = SolutionList []
    | d == 0 = SolutionList [(-b) / (2 * a)]
    | d > 0  = SolutionList [(-b + sqrt d) / (2 * a), (-b - sqrt d) / (2 * a)]
-polysolve _ = error "Polynomial degree is strictly greater than 2, I can't solve."
+polysolve _ = error "Polynomial degree is too high"
 
 solutionsToString :: Show a => Solutions a -> String
 solutionsToString (SolutionList []) = "∅"
@@ -82,39 +90,50 @@ assert :: Bool -> String -> IO ()
 assert True _ = return ()
 assert False msg = error msg
 
+readPoly :: String -> IO [Double]
+readPoly name = do
+  putStr $ name ++ "(x): "
+  flush
+  line <- getLine
+  let
+    poly = map read $ words line
+    poly' = polytrim poly
+  return poly'
+
+readNumber :: String -> IO Double
+readNumber name = do
+  putStr $ name ++ " = "
+  flush
+  read <$> getLine
+
 main :: IO ()
 main = do
-  putStr "Choose operation [+-*/0]: "
+  putStr "Choose operation [+-*/y0]: "
   flush
   c <- getLine
   assert (length c == 1) "Invalid operation"
-  assert (head c `elem` "+-*/0") "Invalid operation"
+  assert (head c `elem` "+-*/y0") "Invalid operation"
   let operationMessage
        | c == "/" = "W(x) = P(x) * Q(x) + R(x)"
+       | c == "y" = "y = W(x)"
        | c == "0" = "W(x) = 0 <=> x ∈ A"
        | otherwise = "Q(x) = W(x) " ++ c ++ " P(x)"
   putStrLn operationMessage
-  putStr "W(x): "
-  flush
-  w <- getLine
+  w <- readPoly "W"
   p <-
-    if c /= "0" then do
-      putStr "P(x): "
-      flush
-      getLine
-    else return ""
-  let
-    w' = map read $ words w
-    p' = map read $ words p
-    result =
-      case c of
-        "+" -> "Q(x): " ++ unwords (map show $ polyadd w' p')
-        "-" -> "Q(x): " ++ unwords (map show $ polysub w' p')
-        "*" -> "Q(x): " ++ unwords (map show $ polymulp w' p')
-        "/" -> text where
-          (q, r) = polydiv w' p'
-          text = "Q(x): " ++ unwords (map show q)
-            ++ "\nR(x): " ++ unwords (map show r)
-        "0" -> "A = " ++ solutionsToString (polysolve w')
-        _ -> error "Unreachable"
-  putStrLn result
+    if c /= "0" && c /= "y" then readPoly "P"
+    else return []
+  x <-
+    if c == "y" then readNumber "x"
+    else return 0
+  putStrLn $ case c of
+    "+" -> "Q(x): " ++ unwords (map show $ polyadd w p)
+    "-" -> "Q(x): " ++ unwords (map show $ polysub w p)
+    "*" -> "Q(x): " ++ unwords (map show $ polymulp w p)
+    "/" -> text where
+      (q, r) = polydiv w p
+      text = "Q(x): " ++ unwords (map show q)
+        ++ "\nR(x): " ++ unwords (map show r)
+    "y" -> "y = " ++ show (polyapply w x)
+    "0" -> "A = " ++ solutionsToString (polysolve w)
+    _ -> error "Unreachable"
