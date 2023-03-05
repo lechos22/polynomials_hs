@@ -1,4 +1,4 @@
-import Data.List (transpose)
+import Data.List (transpose, intercalate)
 import System.IO (hFlush, stdout)
 
 polytrim :: Eq a => Num a => [a] -> [a]
@@ -54,6 +54,29 @@ polydiv p1 p2 = pdiv p1 [] where
       then (acc, p1trim)
       else pdiv after_subtract new_acc
 
+data Solutions a = SolutionList [a] | InfiniteSolutions
+
+polysolve :: Eq a => Num a => Fractional a => Floating a => Ord a => [a] -> Solutions a
+polysolve [] = InfiniteSolutions
+polysolve (0: xs) = polysolve xs
+polysolve [_] = SolutionList []
+polysolve [_, 0] = SolutionList [0]
+polysolve [a, b] = SolutionList [-b/a]
+polysolve [a, b, c] = result where
+  d = b^2 - 4 * a * c
+  result
+   | d < 0  = SolutionList []
+   | d == 0 = SolutionList [(-b) / (2 * a)]
+   | d > 0  = SolutionList [(-b + sqrt d) / (2 * a), (-b - sqrt d) / (2 * a)]
+polysolve _ = error "Polynomial degree is strictly greater than 2, I can't solve."
+
+solutionsToString :: Show a => Solutions a -> String
+solutionsToString (SolutionList solutions) =
+  case solutions of
+    [] -> "∅"
+    _ -> "{" ++ intercalate ", " (map show solutions) ++ "}"
+solutionsToString InfiniteSolutions = "R"
+
 flush :: IO ()
 flush = hFlush stdout
 
@@ -63,33 +86,38 @@ assert False msg = error msg
 
 main :: IO Int
 main = do
-  putStr "Choose operation [+-*/]: "
+  putStr "Choose operation [+-*/0]: "
   flush
   c <- getLine
   assert (length c == 1) "Invalid operation"
-  assert (head c `elem` "+-*/") "Invalid operation"
-  putStrLn $
-    if c == "/"
-    then "A(x) = B(x) * Q(x) + R(x)"
-    else "Q(x) = A(x) " ++ c ++ " B(x)"
-  putStr "A(x): "
+  assert (head c `elem` "+-*/0") "Invalid operation"
+  let operationMessage
+       | c == "/" = "W(x) = P(x) * Q(x) + R(x)"
+       | c == "0" = "W(x) = 0 <=> x ∈ A"
+       | otherwise = "Q(x) = W(x) " ++ c ++ " P(x)"
+  putStrLn operationMessage
+  putStr "W(x): "
   flush
-  a <- getLine
-  putStr "B(x): "
-  flush
-  b <- getLine
+  w <- getLine
+  p <-
+    if c /= "0" then do
+      putStr "P(x): "
+      flush
+      getLine
+    else return ""
   let
-    a' = map read $ words a
-    b' = map read $ words b
+    w' = map read $ words w
+    p' = map read $ words p
     result =
       case c of
-        "+" -> "Q(x): " ++ unwords (map show $ polyadd a' b')
-        "-" -> "Q(x): " ++ unwords (map show $ polysub a' b')
-        "*" -> "Q(x): " ++ unwords (map show $ polymulp a' b')
+        "+" -> "Q(x): " ++ unwords (map show $ polyadd w' p')
+        "-" -> "Q(x): " ++ unwords (map show $ polysub w' p')
+        "*" -> "Q(x): " ++ unwords (map show $ polymulp w' p')
         "/" -> text where
-          (q, r) = polydiv a' b'
+          (q, r) = polydiv w' p'
           text = "Q(x): " ++ unwords (map show q)
             ++ "\nR(x): " ++ unwords (map show r)
+        "0" -> "A = " ++ solutionsToString (polysolve w')
         _ -> error "Unreachable"
   putStrLn result
   return 0
