@@ -75,12 +75,11 @@ polysolve [a, b, c] = result where
    | d < 0  = SolutionList []
    | d == 0 = SolutionList [(-b) / (2 * a)]
    | d > 0  = SolutionList [(-b + sqrt d) / (2 * a), (-b - sqrt d) / (2 * a)]
-polysolve w = find 0 where
-  find x = do
+polysolve w = guess 0 where
+  guess x = do
     let
       eps = 1e-6
       y = polyapply w x
-      deriv = polyapply w (x+eps) - y
       otherSolutions = polysolve (fst $ polydiv w [1, -x])
       solutions InfiniteSolutions = InfiniteSolutions
       solutions (SolutionList list) = SolutionList $ x : list
