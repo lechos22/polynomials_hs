@@ -139,9 +139,13 @@ readNumber name = do
   flush
   read <$> getLine
 
-showPoly :: [Double] -> String
-showPoly [] = "0"
-showPoly poly = intercalate " + " $ reverse $ map showTerm $ filter ((/=0).snd) $ zip [0 ..] poly
+showPoly :: String -> [Double] -> IO ()
+showPoly _ [] = putStrLn "0"
+showPoly name poly = putStrLn $ name ++ "(x): " ++ unwords (map show poly)
+
+showPoly' :: String -> [Double] -> IO ()
+showPoly' _ [] = putStrLn "0"
+showPoly' name poly = putStrLn $ name ++ "(x) = " ++ intercalate " + " (reverse $ map showTerm $ filter ((/=0).snd) $ zip [0 ..] poly)
   where
     showTerm (0, c) = show c
     showTerm (1, c) = show c ++ "x"
@@ -169,17 +173,14 @@ main = do
     if c == "y"
       then readNumber "x"
       else return 0
-  putStrLn $
-    case c of
-      "+" -> "Q(x) = " ++ showPoly (polyadd w p)
-      "-" -> "Q(x) = " ++ showPoly (polysub w p)
-      "*" -> "Q(x) = " ++ showPoly (polymulp w p)
-      "/" -> text
-        where
-          (q, r) = polydiv w p
-          text =
-            "Q(x) = " ++ showPoly q ++
-            "\nR(x) = " ++ showPoly r
-      "y" -> "y = " ++ show (polyapply w x)
-      "0" -> "A ⊇ " ++ solutionsToString (polysolve w)
-      _ -> error "Unreachable"
+  case c of
+    "+" -> showPoly "Q" $ polyadd w p
+    "-" -> showPoly "Q" $ polysub w p
+    "*" -> showPoly "Q" $ polymulp w p
+    "/" -> do
+        let (q, r) = polydiv w p
+        showPoly "Q" q
+        showPoly "R" r
+    "y" -> putStrLn ("y = " ++ show (polyapply w x))
+    "0" -> putStrLn ("A ⊇ " ++ solutionsToString (polysolve w))
+    _ -> error "Unreachable"
