@@ -39,6 +39,14 @@ polymulp p1 p2 = result
 
 polydiv :: [Double] -> [Double] -> ([Double], [Double])
 polydiv _ [] = ([1 / 0], [])
+polydiv p1 [1, y] = result where -- horners method
+  x0 = -y
+  pdiv [] pacc acc = (pacc, [acc])
+  pdiv [a] pacc acc = (pacc, [a + x0 * acc])
+  pdiv (a:as) pacc acc = pdiv as (pacc++[new_acc]) new_acc
+    where
+      new_acc = a + x0 * acc
+  result = pdiv p1 [] 0
 polydiv p1 p2 = pdiv p1 []
   where
     p2trim = polytrim p2
