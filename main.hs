@@ -139,6 +139,14 @@ readNumber name = do
   flush
   read <$> getLine
 
+showPoly :: [Double] -> String
+showPoly [] = "0"
+showPoly poly = intercalate " + " $ reverse $ zipWith (curry showTerm) [0 .. ] (reverse poly)
+  where
+    showTerm (0, c) = show c
+    showTerm (1, c) = show c ++ "x"
+    showTerm (n, c) = show c ++ "x^" ++ show n
+
 main :: IO ()
 main = do
   putStr "Choose operation [+-*/y0]: "
@@ -163,15 +171,15 @@ main = do
       else return 0
   putStrLn $
     case c of
-      "+" -> "Q(x): " ++ unwords (map show $ polyadd w p)
-      "-" -> "Q(x): " ++ unwords (map show $ polysub w p)
-      "*" -> "Q(x): " ++ unwords (map show $ polymulp w p)
+      "+" -> "Q(x) = " ++ showPoly (polyadd w p)
+      "-" -> "Q(x) = " ++ showPoly (polysub w p)
+      "*" -> "Q(x) = " ++ showPoly (polymulp w p)
       "/" -> text
         where
           (q, r) = polydiv w p
           text =
-            "Q(x): " ++ unwords (map show q) ++
-            "\nR(x): " ++ unwords (map show r)
+            "Q(x) = " ++ showPoly q ++
+            "\nR(x) = " ++ showPoly r
       "y" -> "y = " ++ show (polyapply w x)
       "0" -> "A ⊇ " ++ solutionsToString (polysolve w)
       _ -> error "Unreachable"
