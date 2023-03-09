@@ -83,7 +83,12 @@ areInts [] = True
 areInts arr = all isInt arr
 
 divisors :: Integral a => a -> [a]
-divisors n = [x | x <- [1 .. ceiling $ sqrt (fromIntegral n :: Double) :: Integral a => a], n `mod` x == 0]
+divisors n = smalls ++ middle ++ bigs where
+  root = sqrt (fromIntegral n :: Double)
+  smalls = [x | x <- [1 .. (ceiling root :: Integral a => a) - 1], n `mod` x == 0]
+  root_int = floor root :: Integral a => a
+  middle = [root_int | fromIntegral root_int == root]
+  bigs = map (n `div`) smalls
 
 polysolve :: [Double] -> Solutions Double
 polysolve [] = InfiniteSolutions -- empty polynomial
@@ -93,15 +98,16 @@ polysolve [a, b] = SolutionList [-b / a] -- linear
 polysolve [a, b, c] = result -- quadratic
   where
     d = b ^ 2 - 4 * a * c
+    d0 = (-b) / (2 * a)
     result
       | d < 0 = SolutionList []
-      | d == 0 = SolutionList [(-b) / (2 * a)]
+      | d == 0 = SolutionList [d0, d0]
       | d > 0 = SolutionList [(-b + sqrt d) / (2 * a), (-b - sqrt d) / (2 * a)]
 polysolve (a0:as) = result -- higher degree
   where
     eps = 1e-6 -- acceptable error
     a_last = last (a0:as)
-    a_last_divisors = map fromIntegral $ divisors (ceiling $ abs a_last :: Int)
+    a_last_divisors = map fromIntegral $ divisors (round $ abs a_last :: Int)
     candidates
      | areInts (a0:as) && a0 == 1.0 = 0:(a_last_divisors ++ map negate a_last_divisors)
      | otherwise = [0]
