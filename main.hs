@@ -121,7 +121,7 @@ polysolve (a0:as) = result -- higher degree
     candidates
      | areInts (a0:as) = 0:(pos_candidates ++ map negate pos_candidates)
      | otherwise = [0]
-    guessed = filter (\x -> abs (polyapply (a0:as) x) < eps) candidates
+    guessed = [x | x <- candidates, abs (polyapply (a0:as) x) < eps]
     new_poly = foldl' (\acc x -> fst $ polydiv acc [1, -x]) (a0:as) guessed
     result
      | null guessed = SolutionList []
