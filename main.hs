@@ -1,11 +1,11 @@
-import           Data.List (intercalate, transpose)
+import           Data.List (intercalate, transpose, foldl')
 import           System.IO (hFlush, stdout)
 
-polytrim :: (Eq a, Num a) => [a] -> [a]
+polytrim :: [Double] -> [Double]
 polytrim (0:xs) = polytrim xs
 polytrim arr    = arr
 
-polyzip :: Num a => [a] -> [a] -> [[a]]
+polyzip :: [Double] -> [Double] -> [[Double]]
 polyzip a1 a2 = zipped
   where
     size_dif = length a1 - length a2
@@ -15,19 +15,19 @@ polyzip a1 a2 = zipped
         , replicate (max 0 size_dif) 0 ++ a2
         ]
 
-polyadd :: Num a => [a] -> [a] -> [a]
+polyadd :: [Double] -> [Double] -> [Double]
 polyadd p1 p2 = map sum $ polyzip p1 p2
 
-polyopp :: Num a => [a] -> [a]
+polyopp :: [Double] -> [Double]
 polyopp = map negate
 
-polysub :: Num a => [a] -> [a] -> [a]
+polysub :: [Double] -> [Double] -> [Double]
 polysub p1 p2 = polyadd p1 $ polyopp p2
 
-polymuln :: Num a => [a] -> a -> [a]
+polymuln :: [Double] -> Double -> [Double]
 polymuln p n = map (* n) p
 
-polymulp :: Num a => [a] -> [a] -> [a]
+polymulp :: [Double] -> [Double] -> [Double]
 polymulp p1 p2 = result
   where
     pmul [] _ acc = acc
@@ -37,7 +37,7 @@ polymulp p1 p2 = result
        in pmul xs (0 : padding) new_acc
     result = pmul (reverse p1) [] []
 
-polydiv :: (Eq a, Num a, Fractional a) => [a] -> [a] -> ([a], [a])
+polydiv :: [Double] -> [Double] -> ([Double], [Double])
 polydiv _ [] = ([1 / 0], [])
 polydiv p1 p2 = pdiv p1 []
   where
@@ -61,7 +61,11 @@ data Solutions a
   = SolutionList [a]
   | InfiniteSolutions
 
-polyapply :: (Num a, Floating a) => [a] -> a -> a
+joinSolutions :: Solutions a -> Solutions a -> Solutions a
+joinSolutions (SolutionList a) (SolutionList b) = SolutionList $ a ++ b
+joinSolutions _ _ = InfiniteSolutions
+
+polyapply :: [Double] -> Double -> Double
 polyapply [] _ = 0
 polyapply a x = papply a 0
   where
@@ -71,30 +75,41 @@ polyapply a x = papply a 0
         deg = length as
         new_acc = acc + a * x ^ deg
 
-polysolve ::
-     (Eq a, Num a, Fractional a, Floating a, Ord a) => [a] -> Solutions a
-polysolve [] = InfiniteSolutions
-polysolve (0:xs) = polysolve xs
-polysolve [_] = SolutionList []
-polysolve [a, b] = SolutionList [-b / a]
-polysolve [a, b, c] = result
+isInt :: Double -> Bool
+isInt x = x == fromInteger (round x)
+
+areInts :: [Double] -> Bool
+areInts [] = True
+areInts arr = all isInt arr
+
+divisors :: Integral a => a -> [a]
+divisors n = [x | x <- [1 .. ceiling $ sqrt (fromIntegral n :: Double) :: Integral a => a], n `mod` x == 0]
+
+polysolve :: [Double] -> Solutions Double
+polysolve [] = InfiniteSolutions -- empty polynomial
+polysolve (0:as) = polysolve as -- skip leading zeros
+polysolve [_] = SolutionList [] -- constant different from 0
+polysolve [a, b] = SolutionList [-b / a] -- linear
+polysolve [a, b, c] = result -- quadratic
   where
     d = b ^ 2 - 4 * a * c
     result
       | d < 0 = SolutionList []
       | d == 0 = SolutionList [(-b) / (2 * a)]
       | d > 0 = SolutionList [(-b + sqrt d) / (2 * a), (-b - sqrt d) / (2 * a)]
-polysolve w = guess 0
+polysolve (a0:as) = result -- higher degree
   where
-    guess x = do
-      let eps = 1e-6
-          y = polyapply w x
-          otherSolutions = polysolve (fst $ polydiv w [1, -x])
-          solutions InfiniteSolutions   = InfiniteSolutions
-          solutions (SolutionList list) = SolutionList $ x : list
-      if abs y < eps
-        then solutions otherSolutions
-        else error "Unable to solve polynomial"
+    eps = 1e-6
+    a_last = last (a0:as)
+    a_last_divisors = map fromIntegral $ divisors (ceiling $ abs a_last :: Int)
+    to_guess
+     | areInts (a0:as) && a0 == 1.0 = 0:(a_last_divisors ++ map negate a_last_divisors)
+     | otherwise = [0]
+    guessed = filter (\x -> abs (polyapply (a0:as) x) < eps) to_guess
+    new_poly = foldl' (\acc x -> fst $ polydiv acc [1, -x]) (a0:as) guessed
+    result
+     | null guessed = SolutionList []
+     | otherwise = joinSolutions (SolutionList guessed) $ polysolve new_poly
 
 solutionsToString :: Show a => Solutions a -> String
 solutionsToString (SolutionList []) = "∅"
@@ -109,7 +124,7 @@ assert :: Bool -> String -> IO ()
 assert True _    = return ()
 assert False msg = error msg
 
-readPoly :: (Read a, Eq a, Num a) => String -> IO [a]
+readPoly :: String -> IO [Double]
 readPoly name = do
   putStr $ name ++ "(x): "
   flush
@@ -134,7 +149,7 @@ main = do
   let operationMessage
         | c == "/" = "W(x) = P(x) * Q(x) + R(x)"
         | c == "y" = "y = W(x)"
-        | c == "0" = "W(x) = 0 <=> x ∈ A"
+        | c == "0" = "A = {x | W(x) = 0}"
         | otherwise = "Q(x) = W(x) " ++ c ++ " P(x)"
   putStrLn operationMessage
   w <- readPoly "W"
@@ -158,5 +173,5 @@ main = do
             "Q(x): " ++ unwords (map show q) ++
             "\nR(x): " ++ unwords (map show r)
       "y" -> "y = " ++ show (polyapply w x)
-      "0" -> "A = " ++ solutionsToString (polysolve w)
+      "0" -> "A ⊇ " ++ solutionsToString (polysolve w)
       _ -> error "Unreachable"
