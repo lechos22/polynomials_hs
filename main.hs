@@ -2,17 +2,17 @@ import           Data.List (intercalate, transpose, foldl')
 import           System.IO (hFlush, stdout)
 
 polytrim :: [Double] -> [Double]
-polytrim (0:xs) = polytrim xs
+polytrim (0:as) = polytrim as
 polytrim arr    = arr
 
 polyzip :: [Double] -> [Double] -> [[Double]]
-polyzip a1 a2 = zipped
+polyzip p1 p2 = zipped
   where
-    size_dif = length a1 - length a2
+    size_dif = length p1 - length p2
     zipped =
       transpose
-        [ replicate (max 0 (-size_dif)) 0 ++ a1
-        , replicate (max 0 size_dif) 0 ++ a2
+        [ replicate (max 0 (-size_dif)) 0 ++ p1
+        , replicate (max 0 size_dif) 0 ++ p2
         ]
 
 polyadd :: [Double] -> [Double] -> [Double]
@@ -31,10 +31,10 @@ polymulp :: [Double] -> [Double] -> [Double]
 polymulp p1 p2 = result
   where
     pmul [] _ acc = acc
-    pmul (x:xs) padding acc =
-      let to_add = polymuln p2 x ++ padding
+    pmul (a:as) padding acc =
+      let to_add = polymuln p2 a ++ padding
           new_acc = polyadd acc to_add
-       in pmul xs (0 : padding) new_acc
+       in pmul as (0 : padding) new_acc
     result = pmul (reverse p1) [] []
 
 polydiv :: [Double] -> [Double] -> ([Double], [Double])
@@ -67,7 +67,7 @@ joinSolutions _ _ = InfiniteSolutions
 
 polyapply :: [Double] -> Double -> Double
 polyapply [] _ = 0
-polyapply a x = papply a 0
+polyapply p x = papply p 0
   where
     papply [] acc = acc
     papply (a:as) acc = papply as new_acc
@@ -99,13 +99,13 @@ polysolve [a, b, c] = result -- quadratic
       | d > 0 = SolutionList [(-b + sqrt d) / (2 * a), (-b - sqrt d) / (2 * a)]
 polysolve (a0:as) = result -- higher degree
   where
-    eps = 1e-6
+    eps = 1e-6 -- acceptable error
     a_last = last (a0:as)
     a_last_divisors = map fromIntegral $ divisors (ceiling $ abs a_last :: Int)
-    to_guess
+    candidates
      | areInts (a0:as) && a0 == 1.0 = 0:(a_last_divisors ++ map negate a_last_divisors)
      | otherwise = [0]
-    guessed = filter (\x -> abs (polyapply (a0:as) x) < eps) to_guess
+    guessed = filter (\x -> abs (polyapply (a0:as) x) < eps) candidates
     new_poly = foldl' (\acc x -> fst $ polydiv acc [1, -x]) (a0:as) guessed
     result
      | null guessed = SolutionList []
