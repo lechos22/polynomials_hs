@@ -148,11 +148,11 @@ readNumber name = do
   read <$> getLine
 
 showPoly :: String -> [Double] -> IO ()
-showPoly _ [] = putStrLn "0"
+showPoly _ [] = putStrLn $ name ++ "(x): 0"
 showPoly name poly = putStrLn $ name ++ "(x): " ++ unwords (map show poly)
 
 showPoly' :: String -> [Double] -> IO ()
-showPoly' _ [] = putStrLn "0"
+showPoly' _ [] = putStrLn $ name ++ "(x) = 0"
 showPoly' name poly = putStrLn $ name ++ "(x) = " ++ intercalate " + " (reverse $ map showTerm $ filter ((/=0).snd) $ zip [0 ..] poly)
   where
     showTerm (0, c) = show c
