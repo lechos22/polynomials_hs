@@ -1,3 +1,5 @@
+#!/usr/bin/env nix-shell
+#!nix-shell --pure -i runghc -p "haskellPackages.ghcWithPackages (pkgs: [])"
 import           Data.List (intercalate, transpose, sort, foldl')
 import           System.IO (hFlush, stdout)
 
