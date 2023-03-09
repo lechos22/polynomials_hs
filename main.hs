@@ -1,4 +1,4 @@
-import           Data.List (intercalate, transpose, foldl')
+import           Data.List (intercalate, transpose, sort, foldl')
 import           System.IO (hFlush, stdout)
 
 polytrim :: [Double] -> [Double]
@@ -119,10 +119,10 @@ polysolve (a0:as) = result -- higher degree
      | null guessed = SolutionList []
      | otherwise = joinSolutions (SolutionList guessed) $ polysolve new_poly
 
-solutionsToString :: Show a => Solutions a -> String
+solutionsToString :: Solutions Double -> String
 solutionsToString (SolutionList []) = "∅"
 solutionsToString (SolutionList solutions) =
-  "{" ++ intercalate ", " (map show solutions) ++ "}"
+  "{" ++ intercalate ", " (map show $ sort solutions) ++ "}"
 solutionsToString InfiniteSolutions = "R"
 
 flush :: IO ()
