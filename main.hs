@@ -141,7 +141,7 @@ readNumber name = do
 
 showPoly :: [Double] -> String
 showPoly [] = "0"
-showPoly poly = intercalate " + " $ reverse $ zipWith (curry showTerm) [0 .. ] (reverse poly)
+showPoly poly = intercalate " + " $ reverse $ map showTerm $ filter ((/=0).snd) $ zip [0 ..] poly
   where
     showTerm (0, c) = show c
     showTerm (1, c) = show c ++ "x"
