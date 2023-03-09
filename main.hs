@@ -108,8 +108,10 @@ polysolve (a0:as) = result -- higher degree
     eps = 1e-6 -- acceptable error
     a_last = last (a0:as)
     a_last_divisors = map fromIntegral $ divisors (round $ abs a_last :: Int)
+    a0_divisors = map fromIntegral $ divisors (round $ abs a0 :: Int)
+    pos_candidates = [a / b | a <- a_last_divisors, b <- a0_divisors]
     candidates
-     | areInts (a0:as) && a0 == 1.0 = 0:(a_last_divisors ++ map negate a_last_divisors)
+     | areInts (a0:as) = 0:(pos_candidates ++ map negate pos_candidates)
      | otherwise = [0]
     guessed = filter (\x -> abs (polyapply (a0:as) x) < eps) candidates
     new_poly = foldl' (\acc x -> fst $ polydiv acc [1, -x]) (a0:as) guessed
