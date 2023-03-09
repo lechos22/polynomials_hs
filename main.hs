@@ -30,12 +30,12 @@ polymuln p n = map (* n) p
 polymulp :: [Double] -> [Double] -> [Double]
 polymulp p1 p2 = result
   where
-    pmul [] _ acc = acc
-    pmul (a:as) padding acc =
-      let to_add = polymuln p2 a ++ padding
+    pmul [] acc = acc
+    pmul (a:as) acc =
+      let to_add = polymuln p2 a ++ replicate (length as) 0
           new_acc = polyadd acc to_add
-       in pmul as (0 : padding) new_acc
-    result = pmul (reverse p1) [] []
+       in pmul as new_acc
+    result = pmul p1 []
 
 polydiv :: [Double] -> [Double] -> ([Double], [Double])
 polydiv _ [] = ([1 / 0], [])
