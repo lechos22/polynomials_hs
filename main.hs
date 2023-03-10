@@ -158,7 +158,7 @@ readNumber name = do
 
 showPoly :: String -> [Double] -> IO ()
 showPoly name [] = putStrLn $ name ++ "(x): 0"
-showPoly name poly = putStrLn $ name ++ "(x): " ++ unwords (map show poly)
+showPoly name poly = putStrLn $ name ++ "(x): " ++ unwords (map show $ polytrim poly)
 
 showPoly' :: String -> [Double] -> IO ()
 showPoly' name [] = putStrLn $ name ++ "(x) = 0"
