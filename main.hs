@@ -158,7 +158,7 @@ readNumber name = do
 
 showPoly :: String -> [Double] -> IO ()
 showPoly name [] = putStrLn $ name ++ "(x): 0"
-showPoly name poly = putStrLn $ name ++ "(x): " ++ unwords (map show $ polytrim poly)
+showPoly name poly = putStrLn $ name ++ "(x): " ++ unwords (map show poly)
 
 showPoly' :: String -> [Double] -> IO ()
 showPoly' name [] = putStrLn $ name ++ "(x) = 0"
@@ -167,6 +167,8 @@ showPoly' name poly = putStrLn $ name ++ "(x) = " ++ intercalate " + " (reverse 
     showTerm (0, c) = show c
     showTerm (1, c) = show c ++ "x"
     showTerm (n, c) = show c ++ "x^" ++ show n
+
+myShowPoly = showPoly . polytrim
 
 main :: IO ()
 main = do
@@ -191,13 +193,13 @@ main = do
       then readNumber "x"
       else return 0
   case c of
-    "+" -> showPoly "Q" $ polyadd w p
-    "-" -> showPoly "Q" $ polysub w p
-    "*" -> showPoly "Q" $ polymulp w p
+    "+" -> myShowPoly "Q" $ polyadd w p
+    "-" -> myShowPoly "Q" $ polysub w p
+    "*" -> myShowPoly "Q" $ polymulp w p
     "/" -> do
         let (q, r) = polydiv w p
-        showPoly "Q" q
-        showPoly "R" r
+        myShowPoly "Q" q
+        myShowPoly "R" r
     "y" -> putStrLn ("y = " ++ show (polyapply w x))
     "0" -> putStrLn ("A ⊇ " ++ solutionsToString (polysolve w))
     _ -> error "Unreachable"
